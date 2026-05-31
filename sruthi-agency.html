@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sruthi Agency – Property Advisor</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+    body { background: linear-gradient(135deg, #e8f0fe 0%, #f0f4f8 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+    #app { display: flex; flex-direction: column; height: 700px; width: 500px; background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 8px 40px rgba(26,60,94,0.15); }
+    #header { background: linear-gradient(135deg, #1a3c5e, #1e4d7b); padding: 16px 20px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+    .logo { width: 46px; height: 46px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: #1a3c5e; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    .hinfo { flex: 1; }
+    .hname { font-size: 16px; font-weight: 700; color: #fff; }
+    .htag { font-size: 11px; color: #a8c4e0; margin-top: 2px; }
+    .hstatus { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #7fc97f; background: rgba(127,201,127,0.15); padding: 4px 10px; border-radius: 20px; }
+    .hdot { width: 7px; height: 7px; border-radius: 50%; background: #7fc97f; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    #agentbar { background: #f0f7ff; border-bottom: 1px solid #dde3ea; padding: 5px 16px; font-size: 11px; color: #4a6fa5; display: none; align-items: center; gap: 6px; flex-shrink: 0; }
+    #agentbar.active { display: flex; }
+    .agentdot { width: 6px; height: 6px; border-radius: 50%; background: #4a6fa5; animation: bl2 0.8s infinite alternate; }
+    @keyframes bl2 { from{opacity:0.3} to{opacity:1} }
+    #messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: #f7f9fc; scroll-behavior: smooth; }
+    #messages::-webkit-scrollbar { width: 4px; }
+    #messages::-webkit-scrollbar-thumb { background: #c5d0de; border-radius: 4px; }
+    .msg { display: flex; gap: 8px; align-items: flex-end; animation: fadeIn 0.3s ease; }
+    .msg.user { flex-direction: row-reverse; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+    .avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+    .ba { background: #dbe8f8; color: #1a3c5e; }
+    .ua { background: #d4edda; color: #155724; }
+    .bubble { max-width: 78%; padding: 11px 15px; border-radius: 18px; font-size: 13.5px; line-height: 1.75; }
+    .bot .bubble { background: #fff; border: 1px solid #e2e8f0; color: #1a202c; border-bottom-left-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+    .user .bubble { background: linear-gradient(135deg, #1a3c5e, #1e4d7b); color: #fff; border-bottom-right-radius: 4px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .chip { background: #eef2f7; border: 1px solid #c5d0de; border-radius: 20px; padding: 6px 13px; font-size: 12px; color: #1a3c5e; cursor: pointer; transition: all 0.15s; font-weight: 500; }
+    .chip:hover { background: #dbe8f8; border-color: #1a3c5e; transform: translateY(-1px); }
+    .typing-bubble { background: #fff; border: 1px solid #e2e8f0; padding: 13px 16px; border-radius: 18px; border-bottom-left-radius: 4px; }
+    .dots { display: flex; gap: 4px; align-items: center; }
+    .dots span { width: 7px; height: 7px; border-radius: 50%; background: #a0aec0; animation: dk 1.3s infinite; display: inline-block; }
+    .dots span:nth-child(2) { animation-delay: .2s; }
+    .dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes dk { 0%,80%,100%{opacity:.2;transform:scale(.8)} 40%{opacity:1;transform:scale(1)} }
+    #inputarea { padding: 12px 16px; border-top: 1px solid #e2e8f0; background: #fff; display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
+    #userinput { flex: 1; border: 1.5px solid #c5d0de; border-radius: 24px; padding: 10px 18px; font-size: 13.5px; background: #f7f9fc; color: #1a202c; outline: none; transition: border-color 0.2s; }
+    #userinput:focus { border-color: #1a3c5e; background: #fff; }
+    #sendbtn { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #1a3c5e, #1e4d7b); border: none; cursor: pointer; color: #fff; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: transform 0.15s; box-shadow: 0 2px 8px rgba(26,60,94,0.3); }
+    #sendbtn:hover { transform: scale(1.08); }
+    #sendbtn:active { transform: scale(0.95); }
+    #sendbtn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    #footer { font-size: 11px; color: #a0aec0; text-align: center; padding: 6px 12px 10px; background: #fff; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div class="logo">SA</div>
+    <div class="hinfo">
+      <div class="hname">Sruthi Agency</div>
+      <div class="htag">Property Asset Management &amp; Consultancy</div>
+    </div>
+    <div class="hstatus"><div class="hdot"></div> Online</div>
+  </div>
+  <div id="agentbar"><div class="agentdot"></div><span id="agenttext">Thinking...</span></div>
+  <div id="messages"></div>
+  <div id="inputarea">
+    <input id="userinput" type="text" placeholder="Describe your property concern..." autocomplete="off"/>
+    <button id="sendbtn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg>
+    </button>
+  </div>
+  <div id="footer">Agentic AI &nbsp;·&nbsp; Asset management &amp; wealth advisory &nbsp;·&nbsp; Not a real estate broker</div>
+</div>
+
+<script>
+  var GROQ_API_KEY = "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";
+  var GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+  var MODEL = "llama-3.3-70b-versatile";
+
+  var SYSTEM_PROMPT = "You are a professional property asset advisor for Sruthi Agency, a property management and consultancy firm in India. You are a warm, empathetic wealth advisor and asset manager — NOT a real estate broker.\n\nAlways respond in this flow:\n1. Acknowledge the customer's situation warmly\n2. Present 2-3 relevant options with honest pros and cons\n3. End with: Would you like our team to reach out to you for a detailed consultation?\n\nSRUTHI AGENCY SERVICES:\n1. Property Management - regular visits, maintenance, bill payments, photo reports\n2. Tenant Finding - background check, police verification, lease agreement\n3. Rental Management - rent collection, tenant relations, periodic visits\n4. Property Selling - valuation, documentation, buyer sourcing\n5. Legal & Documentation - title deed, encumbrance, POA for NRIs, Khata\n6. NRI Advisory - remote management, tax guidance, repatriation\n\nRULES:\n- Never schedule calls yourself\n- Never promise specific prices\n- Always give pros and cons for each option\n- Keep responses under 200 words\n- Sound like a human consultant, not a robot\n\nAt the very end of every response on a new line write:\nCHIPS: option1 | option2 | option3";
+
+  var msgs = document.getElementById('messages');
+  var input = document.getElementById('userinput');
+  var btn = document.getElementById('sendbtn');
+  var agentBar = document.getElementById('agentbar');
+  var agentText = document.getElementById('agenttext');
+  var history = [];
+  var busy = false;
+
+  var STEPS = ["Analysing your situation...", "Finding best options...", "Preparing your advice..."];
+
+  var GREETING = {
+    text: "👋 Hello! Welcome to Sruthi Agency. I'm your personal property advisor.\n\nWhether you're an NRI managing property from abroad, or you need expert guidance on your asset — I'm here to help.\n\nTell me about your property situation and I'll walk you through your best options.",
+    chips: ["🏠 I'm an NRI with property in India", "🔒 My property needs security", "💰 I want to rent out my property", "📄 I have documentation issues", "🏷️ I want to sell my property", "🛠️ I need property management"]
+  };
+
+  function scrollBottom() { msgs.scrollTop = msgs.scrollHeight; }
+
+  function addMsg(role, text, chips) {
+    var row = document.createElement('div');
+    row.className = 'msg ' + role;
+    var av = document.createElement('div');
+    av.className = 'avatar ' + (role === 'bot' ? 'ba' : 'ua');
+    av.textContent = role === 'bot' ? 'SA' : 'You';
+    var wrap = document.createElement('div');
+    var bub = document.createElement('div');
+    bub.className = 'bubble';
+    bub.innerHTML = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    wrap.appendChild(bub);
+    if (chips && chips.length) {
+      var cd = document.createElement('div');
+      cd.className = 'chips';
+      chips.forEach(function(c) {
+        var ch = document.createElement('div');
+        ch.className = 'chip';
+        ch.textContent = c;
+        ch.onclick = function() { send(c); };
+        cd.appendChild(ch);
+      });
+      wrap.appendChild(cd);
+    }
+    row.appendChild(av);
+    row.appendChild(wrap);
+    msgs.appendChild(row);
+    scrollBottom();
+  }
+
+  function showTyping() {
+    var row = document.createElement('div');
+    row.className = 'msg bot'; row.id = 'typingrow';
+    var av = document.createElement('div');
+    av.className = 'avatar ba'; av.textContent = 'SA';
+    var bub = document.createElement('div');
+    bub.className = 'typing-bubble';
+    bub.innerHTML = '<div class="dots"><span></span><span></span><span></span></div>';
+    row.appendChild(av); row.appendChild(bub);
+    msgs.appendChild(row); scrollBottom();
+  }
+
+  function removeTyping() {
+    var t = document.getElementById('typingrow');
+    if (t) t.parentNode.removeChild(t);
+  }
+
+  var stepTimer = null;
+  function setAgent(active) {
+    if (active) {
+      var step = 0;
+      agentText.textContent = STEPS[0];
+      agentBar.classList.add('active');
+      stepTimer = setInterval(function() {
+        step = (step + 1) % STEPS.length;
+        agentText.textContent = STEPS[step];
+      }, 1200);
+    } else {
+      clearInterval(stepTimer);
+      agentBar.classList.remove('active');
+    }
+  }
+
+  async function send(text) {
+    text = text.trim();
+    if (!text || busy) return;
+    busy = true; btn.disabled = true; input.value = '';
+    addMsg('user', text);
+    history.push({ role: 'user', content: text });
+    showTyping(); setAgent(true);
+
+    try {
+      var res = await fetch(GROQ_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + GROQ_API_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          messages: [{ role: 'system', content: SYSTEM_PROMPT }].concat(history),
+          max_tokens: 600,
+          temperature: 0.7
+        })
+      });
+
+      var data = await res.json();
+      var fullText = data.choices[0].message.content.trim();
+      var chips = [];
+      var reply = fullText;
+
+      if (fullText.includes('CHIPS:')) {
+        var parts = fullText.split('CHIPS:');
+        reply = parts[0].trim();
+        chips = parts[1].split('|').map(function(c) { return c.trim(); }).filter(Boolean);
+      }
+
+      removeTyping(); setAgent(false);
+      history.push({ role: 'assistant', content: reply });
+      addMsg('bot', reply, chips);
+
+    } catch(e) {
+      removeTyping(); setAgent(false);
+      addMsg('bot', 'Sorry, something went wrong. Please try again.', ['Try again']);
+      history.pop();
+      console.error(e);
+    }
+
+    busy = false; btn.disabled = false; input.focus();
+  }
+
+  btn.onclick = function() { send(input.value); };
+  input.onkeydown = function(e) { if (e.key === 'Enter') send(input.value); };
+  addMsg('bot', GREETING.text, GREETING.chips);
+</script>
+</body>
+</html>
