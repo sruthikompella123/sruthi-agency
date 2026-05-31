@@ -84,7 +84,7 @@
   var errBanner = document.getElementById('errorbanner');
   var agentBar  = document.getElementById('agentbar');
   var agentText = document.getElementById('agenttext');
-  var history   = [];
+  var chatHistory   = [];
   var busy      = false;
 
   var AGENT_STEPS = ["Analysing your situation...", "Identifying relevant services...", "Preparing recommendations...", "Crafting your response..."];
@@ -169,7 +169,7 @@
     if (!text || busy) return;
     busy = true; btn.disabled = true; input.value = '';
     addMsg('user', text);
-    history.push({ role: 'user', content: text });
+    chatHistory.push({ role: 'user', content: text });
     showTyping();
     setAgentStatus(true);
 
@@ -177,23 +177,23 @@
       var res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: history })
+        body: JSON.stringify({ messages: chatHistory })
       });
       var data = await res.json();
       removeTyping();
       setAgentStatus(false);
       if (!res.ok) {
         showError(data.detail || 'Something went wrong. Please try again.');
-        history.pop();
+        chatHistory.pop();
       } else {
-        history.push({ role: 'assistant', content: data.reply });
+        chatHistory.push({ role: 'assistant', content: data.reply });
         addMsg('bot', data.reply, data.chips || []);
       }
     } catch(e) {
       removeTyping();
       setAgentStatus(false);
       showError('Cannot connect to server. Make sure you ran: python3 main.py');
-      history.pop();
+      chatHistory.pop();
     }
     busy = false; btn.disabled = false; input.focus();
   }
